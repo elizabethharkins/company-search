@@ -1,0 +1,117 @@
+:root {
+  --body-color: #333;
+  --card-content-color: #888;
+
+  --body-background-color: #eaedf0;
+  --page-background-color: #fff;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: var(--body-background-color);
+  color: var(--body-color);
+}
+
+h1 {
+  color: #45103e;
+  text-align: center;
+  text-decoration: underline;
+  margin-bottom: 0.25em;
+}
+
+.page {
+  background: var(--page-background-color);
+  padding: 1em;
+  margin: 1em;
+  border-radius: 1em;
+}
+
+.results-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 1em;
+}
+
+.card-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 1em 0 0 0;
+  width: 30em; 
+  max-width: 30em;
+  background: #fff;
+  border: 1px solid #eaedf0;
+  border-radius: 1em;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 15%), 0 2px 2px rgb(0 0 0 / 15%), 0 4px 4px rgb(0 0 0 / 15%), 0 8px 8px rgb(0 0 0 / 15%);
+}
+
+.card-wrapper .logo {
+  border-radius: 1em;
+  padding: 1em;
+}
+
+.card {
+  line-height: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  padding-top: 0.25em;
+  width: 100%;
+}
+
+.card > * {
+  margin: 0;
+}
+
+.card > h3 a {
+  text-decoration: none;
+  color: var(--body-color);
+}
+
+.card .inner {
+  display: flex;
+  color: var(--card-content-color);
+  align-items: center;
+  justify-content: space-between;
+  width: 55%;
+}
+
+.card .upper {
+  display: flex;
+}
+
+.card .inner h3,
+.card .upper h3 {
+  margin: 0.5em 0;
+}
+
+.card .upper > h3:first-child {
+  color: goldenrod;
+  padding-right: 0.5em;
+}
+
+.search-wrapper {
+  text-align: center;
+  margin: 2em 0 0 0;
+}
+#search-form {
+  padding: 0.5em;
+}

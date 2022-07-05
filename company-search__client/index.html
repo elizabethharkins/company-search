@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Company Search UI</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router-dom@5.0.0/umd/react-router-dom.min.js"></script>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC">
+    <link rel="stylesheet" href="app.css">
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+      /* routing, app */
+      const { Link, Route } = ReactRouterDOM;
+
+      const App = () => {
+        return (
+          <ReactRouterDOM.HashRouter>
+            <Route path="/" exact component={ Companies } />
+            <Route path="/jobs" component={ Jobs } />
+          </ReactRouterDOM.HashRouter>
+        );
+      }
+
+      /* companies */
+      const Companies = () => {
+        const [companies, setCompanies] = React.useState([]);
+        const [isLoading, setIsLoading] = React.useState(true);
+        const [query, setQuery] = React.useState("");
+
+        const errorMessages = {
+          empty: "Please enter a search term.",
+          noResults: "No results. Please check your spelling and try again.",
+          unknown: "An unknown error has occurred. Please try again later."
+        };
+
+        const arrayDataIsVerified = (arr) => {
+          return Array.isArray(arr) && arr.length > 0;
+        }
+
+        const fetchCompanies = async () => {
+          try {
+            const response = await fetch("http://localhost:8080/companies", { mode: "cors" });
+            const transformedListFromAPI = await response.json();
+
+            if (arrayDataIsVerified(transformedListFromAPI)) {
+              setCompanies(transformedListFromAPI);
+            }
+            else {
+              console.log("error messaging");
+            }
+          }
+          catch (e) {
+            console.log(e);
+          }
+        }
+
+        React.useEffect(() => {
+          fetchCompanies();
+          setIsLoading(false);
+        }, [])
+
+        const listOfCompanies = companies
+          .filter(company => company.name.toLowerCase()
+          .indexOf(query.toLowerCase()) > -1)
+          .map(company => {
+
+            const setLogoImgSrc = () => {
+              return company.logo ? company.logo : "https://unsplash.it/50/50";
+            }
+
+            return (
+              <div className="card-wrapper" key={company.id}>
+                <a href={company.url}>
+                  <img 
+                    alt="logo" 
+                    src={setLogoImgSrc()} 
+                    width="50" 
+                    height="50" 
+                    className="logo" 
+                  />
+                </a>
+                <div className="card">
+                  <h3><Link to="/jobs">{company.name}</Link></h3>
+                  <div className="inner">
+                    <div className="upper">
+                      <h3>&#9733;</h3>
+                      <h3>{company.score} stars</h3>
+                    </div>
+                    <h3>{company.jobs} jobs</h3>
+                  </div>
+                </div>
+              </div>
+            );
+        });
+
+        return (
+          <Page title="Companies">
+            <div className="search-wrapper">
+              <div className="input-wrapper">
+                <label htmlFor="search-form">
+                  <input
+                    type="search"
+                    name="search-form"
+                    id="search-form"
+                    className="search-input"
+                    placeholder="Filter by name ..."
+                    value={query}
+                    onChange={e => {
+                        setQuery(e.target.value);
+                      }
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+            {isLoading ? <Loading /> : (
+              <ResultsContainer>
+                {listOfCompanies}
+              </ResultsContainer>
+            )}
+          </Page>
+        );
+      }
+
+      /* jobs */
+      const Jobs = () => {
+        const [jobs, setJobs] = React.useState([]);
+        const [isLoading, setIsLoading] = React.useState(true);
+
+        const fetchJobs = async () => {
+          try {
+            console.log("future jobs");
+          }
+          catch (e) {
+            console.log(e);
+          }
+        }
+
+        React.useEffect(() => {
+          fetchJobs();
+          setIsLoading(false);
+        }, [])
+
+        return (
+          <Page title="Jobs">
+            <Link to="/">Back to Companies</Link>
+            {isLoading ? <Loading /> : (
+              <ResultsContainer>
+                List of Jobs ...
+              </ResultsContainer>
+            )}
+          </Page>
+        )
+      }
+          
+      /* structure, utils, etc */
+      const Loading = () => <p>Loading ...</p>
+
+      const ResultsContainer = ({children}) => { 
+        return (
+          <div className="results-container">
+            {children}
+          </div>
+        );
+      }
+
+      const Page = ({title, children}) => { 
+        return (
+          <div className="page">
+            <h1>{title}</h1>
+            {children}
+          </div>
+        );
+      }
+          
+      const AppContainer = () => {
+        return <App />
+      }
+
+      const container = document.getElementById("root");
+      const root = ReactDOM.createRoot(container);
+      root.render(<AppContainer />);
+
+    </script>
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      https://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "company-search__client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "open http://localhost:5500/ && http-server -p 5500"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-transform-react-jsx": "^7.2.0",
+    "babel-minify": "^0.5.0",
+    "babel-preset-minify": "^0.5.0",
+    "http-server": "^14.1.1"
+  }
+}

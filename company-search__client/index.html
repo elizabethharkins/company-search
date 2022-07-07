@@ -15,44 +15,31 @@
     <div id="root"></div>
     <script type="text/babel">
 
-      /* routing, app */
+      /* routing, functions */
       const { Link, Route } = ReactRouterDOM;
 
+      const arrayDataIsVerified = (arr) => {
+        return Array.isArray(arr) && arr.length > 0;
+      };
+
+      let response, transformedListFromAPI;
+
+      /* app */
       const App = () => {
-        return (
-          <ReactRouterDOM.HashRouter>
-            <Route path="/" exact component={ Companies } />
-            <Route path="/jobs" component={ Jobs } />
-          </ReactRouterDOM.HashRouter>
-        );
-      }
-
-      /* companies */
-      const Companies = () => {
         const [companies, setCompanies] = React.useState([]);
+        const [company, setCompany] = React.useState({});
         const [isLoading, setIsLoading] = React.useState(true);
-        const [query, setQuery] = React.useState("");
-
-        const errorMessages = {
-          empty: "Please enter a search term.",
-          noResults: "No results. Please check your spelling and try again.",
-          unknown: "An unknown error has occurred. Please try again later."
-        };
-
-        const arrayDataIsVerified = (arr) => {
-          return Array.isArray(arr) && arr.length > 0;
-        }
 
         const fetchCompanies = async () => {
           try {
-            const response = await fetch("http://localhost:8080/companies", { mode: "cors" });
-            const transformedListFromAPI = await response.json();
+            response = await fetch("http://localhost:8080/companies", { mode: "cors" });
+            transformedListFromAPI = await response.json();
 
             if (arrayDataIsVerified(transformedListFromAPI)) {
               setCompanies(transformedListFromAPI);
             }
             else {
-              console.log("error messaging");
+              console.log("error messaging, etc");
             }
           }
           catch (e) {
@@ -63,12 +50,52 @@
         React.useEffect(() => {
           fetchCompanies();
           setIsLoading(false);
-        }, [])
+        }, []);
+
+        const handleSetCompany = (company) => {
+          setCompany(company);
+        } 
+
+        return (
+          <ReactRouterDOM.HashRouter>
+            <Route 
+              path="/" 
+              exact 
+              render={(props) => 
+                <Companies {...props} 
+                  companies={companies} 
+                  handleSetCompany={handleSetCompany} 
+                  isLoading={isLoading} 
+                />} 
+            />
+            <Route 
+              path="/jobs/:id" 
+              render={(props) => 
+                <Jobs {...props} 
+                  company={company} 
+                  isLoading={isLoading} 
+                />} 
+            />
+          </ReactRouterDOM.HashRouter>
+        );
+      }
+
+      /* companies */
+      const Companies = ({ companies, isLoading, handleSetCompany }) => {
+        const [query, setQuery] = React.useState("");
+
+        const errorMessages = {
+          empty: "Please enter a search term.",
+          noResults: "No results. Please check your spelling and try again.",
+          unknown: "An unknown error has occurred. Please try again later."
+        };
 
         const listOfCompanies = companies
           .filter(company => company.name.toLowerCase()
           .indexOf(query.toLowerCase()) > -1)
           .map(company => {
+
+            const { id } = company;
 
             const setLogoImgSrc = () => {
               return company.logo ? company.logo : "https://unsplash.it/50/50";
@@ -86,7 +113,14 @@
                   />
                 </a>
                 <div className="card">
-                  <h3><Link to="/jobs">{company.name}</Link></h3>
+                  <h3>
+                    <Link 
+                      onClick={() => handleSetCompany(company)} 
+                      to={`/jobs/${id}`}
+                    >
+                      {company.name}
+                    </Link>
+                  </h3>
                   <div className="inner">
                     <div className="upper">
                       <h3>&#9733;</h3>
@@ -129,13 +163,23 @@
       }
 
       /* jobs */
-      const Jobs = () => {
+      const Jobs = ({ company }) => {
         const [jobs, setJobs] = React.useState([]);
         const [isLoading, setIsLoading] = React.useState(true);
 
+        const { id } = company;
+
         const fetchJobs = async () => {
           try {
-            console.log("future jobs");
+            response = await fetch(`http://localhost:8080/jobs/${id}`, { mode: "cors" });
+            transformedListFromAPI = await response.json();
+
+            if (arrayDataIsVerified(transformedListFromAPI)) {
+              setJobs(transformedListFromAPI);
+            }
+            else {
+              console.log("error messaging, etc");
+            }
           }
           catch (e) {
             console.log(e);
@@ -147,12 +191,31 @@
           setIsLoading(false);
         }, [])
 
+        const listOfJobs = jobs
+          .map(job => {
+            return (
+              <div className="card-wrapper" key={job.id}>
+                <div className="card" style={{"padding" : "1em 1em 0.5em 1em"}}>
+                  <h3>{job.title}</h3>
+                  <div className="inner">
+                    {arrayDataIsVerified(job.locations) && (
+                      <div className="upper">
+                        <h3>{job.locations}</h3>
+                      </div>)
+                    }
+                    {job.remote && <h3>{job.remote}</h3>}
+                  </div>
+                </div>
+              </div>
+            );
+        });
+
         return (
-          <Page title="Jobs">
+          <Page title={`${company.name} Jobs`}>
             <Link to="/">Back to Companies</Link>
             {isLoading ? <Loading /> : (
               <ResultsContainer>
-                List of Jobs ...
+                {listOfJobs}
               </ResultsContainer>
             )}
           </Page>

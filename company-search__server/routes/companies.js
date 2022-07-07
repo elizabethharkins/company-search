@@ -1,15 +1,16 @@
 const companiesRouter = require("express").Router();
 const fetch = require("node-fetch");
 
+/* todo, temp */
+const generateRandomNumberOfJobsForCompanyData = () => {
+  return Math.floor(Math.random() * 200) + 1;
+}
+
 companiesRouter.get("/companies", async (req, res, next) => {  
   try {
     const companies = 
       await fetch("https://www.inhersight.com/api/v1/ihs-candidates/companies?page=1")
         .then(res => res.json());
-
-    const generateRandomNumberOfJobsForCompanyData = () => {
-      return Math.floor(Math.random() * 200) + 1;
-    }
       
     const transformRawData = (data) => data
       .map(data => { return { 

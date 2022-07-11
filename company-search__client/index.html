@@ -22,8 +22,6 @@
         return Array.isArray(arr) && arr.length > 0;
       };
 
-      let response, transformedListFromAPI;
-
       /* app */
       const App = () => {
         const [companies, setCompanies] = React.useState([]);
@@ -32,8 +30,8 @@
 
         const fetchCompanies = async () => {
           try {
-            response = await fetch("http://localhost:8080/companies", { mode: "cors" });
-            transformedListFromAPI = await response.json();
+            const response = await fetch("http://localhost:8080/companies", { mode: "cors" });
+            const transformedListFromAPI = await response.json();
 
             if (arrayDataIsVerified(transformedListFromAPI)) {
               setCompanies(transformedListFromAPI);
@@ -126,7 +124,7 @@
                       <h3>&#9733;</h3>
                       <h3>{company.score} stars</h3>
                     </div>
-                    <h3>{company.jobs} jobs</h3>
+                    <h3>{company.jobs.count} jobs</h3>
                   </div>
                 </div>
               </div>
@@ -164,30 +162,12 @@
 
       /* jobs */
       const Jobs = ({ company }) => {
-        const [jobs, setJobs] = React.useState([]);
         const [isLoading, setIsLoading] = React.useState(true);
 
-        const { id } = company;
-
-        const fetchJobs = async () => {
-          try {
-            response = await fetch(`http://localhost:8080/jobs/${id}`, { mode: "cors" });
-            transformedListFromAPI = await response.json();
-
-            if (arrayDataIsVerified(transformedListFromAPI)) {
-              setJobs(transformedListFromAPI);
-            }
-            else {
-              console.log("error messaging, etc");
-            }
-          }
-          catch (e) {
-            console.log(e);
-          }
-        }
+        const jobs = company.jobs.results;
+        const id = company.id;
 
         React.useEffect(() => {
-          fetchJobs();
           setIsLoading(false);
         }, [])
 

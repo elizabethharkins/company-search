@@ -26,7 +26,7 @@
       const App = () => {
         const [companies, setCompanies] = React.useState([]);
         const [company, setCompany] = React.useState({});
-        const [isLoading, setIsLoading] = React.useState(true);
+        const [isLoading, setIsLoading] = React.useState(false);
 
         const fetchCompanies = async () => {
           try {
@@ -46,6 +46,7 @@
         }
 
         React.useEffect(() => {
+          setIsLoading(true);
           fetchCompanies();
           setIsLoading(false);
         }, []);
@@ -71,7 +72,6 @@
               render={(props) => 
                 <Jobs {...props} 
                   company={company} 
-                  isLoading={isLoading} 
                 />} 
             />
           </ReactRouterDOM.HashRouter>
@@ -162,27 +162,21 @@
 
       /* jobs */
       const Jobs = ({ company }) => {
-        const [isLoading, setIsLoading] = React.useState(true);
 
         const jobs = company.jobs.results;
         const id = company.id;
 
-        React.useEffect(() => {
-          setIsLoading(false);
-        }, [])
-
         const listOfJobs = jobs
           .map(job => {
+
+            const locations = job.locations.join("; ");
+
             return (
               <div className="card-wrapper" key={job.id}>
                 <div className="card" style={{"padding" : "1em 1em 0.5em 1em"}}>
                   <h3>{job.title}</h3>
                   <div className="inner">
-                    {arrayDataIsVerified(job.locations) && (
-                      <div className="upper">
-                        <h3>{job.locations}</h3>
-                      </div>)
-                    }
+                    {arrayDataIsVerified(job.locations) && <h3>{locations}</h3>}
                     {job.remote && <h3>{job.remote}</h3>}
                   </div>
                 </div>
@@ -193,11 +187,9 @@
         return (
           <Page title={`${company.name} Jobs`}>
             <Link to="/">Back to Companies</Link>
-            {isLoading ? <Loading /> : (
-              <ResultsContainer>
-                {listOfJobs}
-              </ResultsContainer>
-            )}
+            <ResultsContainer>
+              {listOfJobs}
+            </ResultsContainer>
           </Page>
         )
       }
